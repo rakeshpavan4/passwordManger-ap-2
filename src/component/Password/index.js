@@ -10,6 +10,8 @@ class Password extends Component {
     username: '',
     password: '',
     userpasswordList: [],
+    show: false,
+    searchInput: '',
   }
 
   onAddUsernamepassword = event => {
@@ -42,8 +44,36 @@ class Password extends Component {
     this.setState({password: event.target.value})
   }
 
+  onCheck = () => {
+    const {show} = this.state
+    this.setState({show: !show})
+  }
+
+  deletepassword = id => {
+    const {userpasswordList} = this.state
+
+    this.setState({
+      userpasswordList: userpasswordList.filter(comment => comment.id !== id),
+    })
+  }
+
+  onchangesearchInput = event => {
+    this.setState({searchInput: event.target.value})
+  }
+
   render() {
-    const {userpasswordList, website, username, password} = this.state
+    const {
+      userpasswordList,
+      searchInput,
+      website,
+      username,
+      password,
+    } = this.state
+
+    const searchresult = userpasswordList.filter(each =>
+      each.website.toLowerCase().includes(searchInput.toLowerCase()),
+    )
+
     return (
       <div className="bg-container">
         <img
@@ -114,7 +144,7 @@ class Password extends Component {
           <div className="navbar">
             <div>
               <h1 className="heading">Your Passwords</h1>
-              <p className="shownumber">0</p>
+              <p className="shownumber">{searchresult.length}</p>
             </div>
             <div className="website-container">
               <img
@@ -127,19 +157,28 @@ class Password extends Component {
                 type="search"
                 placeholder="Search"
                 className="website-input"
+                onChange={this.onchangesearchInput}
               />
             </div>
           </div>
           <hr className="lines" />
-          <div className="showPassword">
-            <input className="showbutton" type="checkbox" />
+          <form className="showPassword">
+            <input
+              className="showbutton"
+              type="checkbox"
+              onChange={this.onCheck}
+            />
             <label htmlFor="title" className="heading">
               Show passwords
             </label>
-          </div>
+          </form>
           <ul className="password-list">
-            {userpasswordList.map(each => (
-              <PasswordItem details={each} key={each.id} />
+            {searchresult.map(each => (
+              <PasswordItem
+                details={each}
+                key={each.id}
+                deletepassword={this.deletepassword}
+              />
             ))}
           </ul>
         </div>
